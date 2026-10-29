@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bóveda Segura</title>
+  <meta name="theme-color" content="#111827" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- iOS: instalable como app desde Safari ("Añadir a pantalla de inicio") -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bóveda" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <style>
+    :root {
+      --bg: #0b1020; --card: #111827; --card2:#1a2234;
+      --text: #e5e7eb; --muted:#9ca3af; --line:#273047;
+      --accent:#6366f1; --accent2:#818cf8;
+      --ok:#34d399; --warn:#fbbf24; --danger:#f87171;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(1200px 600px at 50% -10%, #1b2540, var(--bg));
+      color: var(--text); min-height: 100dvh;
+      padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 16px);
+    }
+    .wrap { max-width: 440px; margin: 0 auto; }
+    header { text-align:center; padding: 28px 0 12px; }
+    header .logo { font-size: 42px; }
+    header h1 { font-size: 20px; margin: 8px 0 2px; letter-spacing:.3px; }
+    header p { color: var(--muted); font-size: 13px; margin: 0; }
+    .card { background: var(--card); border:1px solid var(--line); border-radius: 18px; padding: 20px; margin-top: 16px; }
+    label { display:block; font-size: 12px; color: var(--muted); margin: 12px 0 6px; }
+    input {
+      width: 100%; padding: 14px; border-radius: 12px; border:1px solid var(--line);
+      background: var(--card2); color: var(--text); font-size: 16px;
+    }
+    input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+    button {
+      width: 100%; padding: 14px; border:0; border-radius: 12px; font-size: 16px; font-weight: 600;
+      background: var(--accent); color: white; margin-top: 14px; cursor: pointer;
+    }
+    button:active { transform: scale(.99); }
+    button.secondary { background: var(--card2); color: var(--text); border:1px solid var(--line); }
+    button.danger { background: #3a1620; color: var(--danger); border:1px solid #522; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+    .msg { font-size: 13px; margin-top: 12px; padding: 10px 12px; border-radius: 10px; display:none; }
+    .msg.show { display:block; }
+    .msg.err { background: #3a1620; color: var(--danger); }
+    .msg.ok  { background: #0f2e24; color: var(--ok); }
+    .msg.warn{ background: #352a0e; color: var(--warn); }
+    .hidden { display:none !important; }
+    .entry {
+      background: var(--card2); border:1px solid var(--line); border-radius: 12px;
+      padding: 12px 14px; margin-top: 10px; display:flex; justify-content: space-between; gap:10px;
+    }
+    .entry .k { font-weight: 600; font-size: 14px; }
+    .entry .v { color: var(--muted); font-size: 13px; word-break: break-all; margin-top:3px; }
+    .entry button { width:auto; padding: 6px 10px; margin:0; font-size:12px; background:transparent; color:var(--danger); border:1px solid #522; }
+    .row { display:flex; gap:10px; }
+    .row > * { flex:1; }
+    .attempts { text-align:center; font-size:13px; color:var(--warn); margin-top:10px; min-height: 18px; }
+    .topbar { display:flex; justify-content: space-between; align-items:center; margin-bottom: 4px; }
+    .topbar h2 { font-size: 16px; margin:0; }
+    .topbar button { width:auto; margin:0; padding:8px 12px; font-size:13px; background:var(--card2); border:1px solid var(--line); }
+    .destroyed { text-align:center; padding: 30px 10px; }
+    .destroyed .big { font-size: 56px; }
+    .footer { text-align:center; color: var(--muted); font-size:11px; margin-top: 18px; line-height:1.6;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">🔐</div>
+      <h1>Bóveda Segura</h1>
+      <p>Cifrado AES-256 · autodestrucción · 100% en tu dispositivo</p>
+    </header>
+
+    <!-- CREAR BÓVEDA -->
+    <section id="screen-create" class="card hidden">
+      <h2 style="margin:0 0 4px;font-size:16px">Crea tu bóveda</h2>
+      <p class="hint">Elige una contraseña maestra fuerte. <b>No se guarda en ningún sitio</b> y no se puede recuperar: si la olvidas, pierdes el acceso. Esa es justamente su seguridad.</p>
+      <label>Contraseña maestra</label>
+      <input id="create-pass" type="password" autocomplete="new-password" placeholder="mínimo 8 caracteres" />
+      <label>Repite la contraseña</label>
+      <input id="create-pass2" type="password" autocomplete="new-password" placeholder="repite para confirmar" />
+      <label>Autodestrucción tras cuántos fallos</label>
+      <input id="create-max" type="number" value="5" min="3" max="20" />
+      <button id="btn-create">Crear bóveda cifrada</button>
+      <div id="create-msg" class="msg"></div>
+    </section>
+
+    <!-- DESBLOQUEAR -->
+    <section id="screen-unlock" class="card hidden">
+      <h2 style="margin:0 0 4px;font-size:16px">Desbloquea tu bóveda</h2>
+      <label>Contraseña maestra</label>
+      <input id="unlock-pass" type="password" autocomplete="current-password" placeholder="tu contraseña" />
+      <button id="btn-unlock">Abrir</button>
+      <div class="attempts" id="unlock-attempts"></div>
+      <div id="unlock-msg" class="msg"></div>
+    </section>
+
+    <!-- CONTENIDO DE LA BÓVEDA -->
+    <section id="screen-vault" class="card hidden">
+      <div class="topbar">
+        <h2>Tus secretos</h2>
+        <button id="btn-lock">🔒 Bloquear</button>
+      </div>
+      <div id="entries"></div>
+      <label>Nombre</label>
+      <input id="entry-key" placeholder="p. ej. Contraseña del banco" />
+      <label>Valor (se cifra)</label>
+      <input id="entry-val" placeholder="p. ej. 1234-secreto" />
+      <button id="btn-add">Añadir y cifrar</button>
+      <button id="btn-wipe" class="danger">💥 Autodestruir bóveda ahora</button>
+      <div id="vault-msg" class="msg"></div>
+    </section>
+
+    <!-- DESTRUIDA -->
+    <section id="screen-destroyed" class="card hidden">
+      <div class="destroyed">
+        <div class="big">💥</div>
+        <h2>Bóveda autodestruida</h2>
+        <p class="hint">La clave fue destruida (crypto-erase). Los datos son irrecuperables, ni siquiera con la contraseña correcta. Puedes empezar una bóveda nueva.</p>
+        <button id="btn-reset">Crear bóveda nueva</button>
+      </div>
+    </section>
+
+    <div class="footer">
+      Tus datos nunca salen de este dispositivo.<br/>
+      Úsalo solo con datos propios. Ningún sistema es infalible: guarda copias de lo irremplazable.
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
