@@ -205,6 +205,40 @@ $("btn-lock").onclick = () => { sessionKey = null; sessionData = null; routeStar
 $("btn-wipe").onclick = () => { if (confirm("¿Seguro? Destruye la clave y TODOS los datos para siempre.")) { selfDestruct(); show("destroyed"); } };
 $("btn-reset").onclick = () => { clearState(); startCreate(); show("create"); };
 
+// --- sincronización (exportar / importar copia cifrada) ---
+function exportVault() {
+  const s = loadState();
+  if (!s) return;
+  const blob = new Blob([JSON.stringify(s, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "boveda.vault";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  msg("vault-msg", "Copia exportada ✅ Ábrela en el panel de Windows.", "ok");
+}
+function triggerImport() { $("file-import").click(); }
+$("file-import").onchange = (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const s = JSON.parse(r.result);
+      if (s.destroyed) { saveState(s); show("destroyed"); }
+      else if (!s.salt || !s.blob) { alert("Archivo no válido: no parece una bóveda."); }
+      else {
+        saveState(s); sessionKey = null; sessionData = null; routeStart();
+        msg("unlock-msg", "Copia importada ✅ Desbloquéala con tu patrón.", "ok");
+      }
+    } catch { alert("Archivo no válido o dañado."); }
+    $("file-import").value = "";
+  };
+  r.readAsText(f);
+};
+$("btn-export").onclick = exportVault;
+$("btn-import-vault").onclick = triggerImport;
+$("btn-import-create").onclick = triggerImport;
+
 // --- arranque ---
 padCreate = buildPad("pad-create", "line-create", onCreateDraw);
 padUnlock = buildPad("pad-unlock", "line-unlock", onUnlockDraw);

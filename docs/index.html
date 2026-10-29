@@ -62,6 +62,8 @@
     .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
     .topbar button { width:auto; margin:0; padding:8px 12px; font-size:13px; background:var(--card2); border:1px solid var(--line); }
     .destroyed { text-align:center; padding:26px 10px; }
+    .sync { border-top:1px solid var(--line); margin-top:16px; padding-top:12px; }
+    .sync-title { font-size:13px; font-weight:600; color:var(--accent2); }
     .destroyed .big { font-size:56px; }
     .footer { text-align:center; color:var(--muted); font-size:11px; margin-top:16px; line-height:1.6; }
   </style>
@@ -87,6 +89,7 @@
       <label>Autodestrucción tras cuántos fallos</label>
       <input id="create-max" type="number" value="5" min="3" max="20" />
       <button id="btn-create-reset" class="ghost">Volver a empezar</button>
+      <button id="btn-import-create" class="ghost">📂 Importar copia del PC</button>
       <div id="create-msg" class="msg"></div>
       <p class="hint">El patrón <b>no se guarda</b> y no se puede recuperar. Si lo olvidas, pierdes el acceso: esa es su seguridad.</p>
     </section>
@@ -117,8 +120,17 @@
       <label>Valor (se cifra)</label>
       <input id="entry-val" placeholder="p. ej. 1234-secreto" />
       <button id="btn-add">Añadir y cifrar</button>
+
+      <div class="sync">
+        <div class="sync-title">🔄 Sincronizar con tu PC</div>
+        <p class="hint" style="margin-top:6px">Exporta una copia cifrada, ábrela en el panel de Windows con tu patrón, y reimpórtala aquí. El archivo siempre va cifrado.</p>
+        <button id="btn-export" class="ghost">⬇️ Exportar copia cifrada (.vault)</button>
+        <button id="btn-import-vault" class="ghost">⬆️ Importar copia del PC</button>
+      </div>
+
       <button id="btn-wipe" class="danger">💥 Autodestruir bóveda ahora</button>
       <div id="vault-msg" class="msg"></div>
+      <input id="file-import" type="file" accept=".vault,.json,application/json" class="hidden" />
     </section>
 
     <!-- DESTRUIDA -->
