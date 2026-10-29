@@ -1,0 +1,7 @@
+# Bóvedas y datos sensibles — NUNCA subir a GitHub
+*_vault.json
+*.vault
+*.tmp
+__pycache__/
+*.pyc
+.env
