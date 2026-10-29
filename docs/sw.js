@@ -1,7 +1,7 @@
 // Service Worker — permite que la bóveda funcione SIN conexión (offline-first).
 // Cachea los recursos de la app. Los datos cifrados viven en el dispositivo,
 // nunca en esta caché.
-const CACHE = "boveda-v1";
+const CACHE = "boveda-v2";
 const ASSETS = [
   "./",
   "./index.html",
